@@ -22,13 +22,13 @@ metadata:
 
 | 配置项 | 位置 | 默认值 |
 | --- | --- | --- |
-| Obsidian vault 路径 | 下方「目录约定」 | `C:\Users\<用户名>\OneDrive\Notes`（首次使用先向用户确认实际路径） |
+| Obsidian vault 路径 | 下方「目录约定」 | `<vault>`（首次使用先向用户确认实际路径，如 `C:\Users\<名>\Documents\MyVault`） |
 | 转写模型路径 | `scripts/transcribe.py` 顶部 `MODEL_PATH` | `D:/hf-whisper/faster-whisper-large-v3` |
 | Python 依赖 | `scripts/requirements.txt` | 安装命令见 README |
 
 ## 目录约定
 
-- Obsidian vault：`C:\Users\<用户名>\OneDrive\Notes`（先向用户确认实际 vault 路径）
+- Obsidian vault：`<vault>`（先向用户确认实际 vault 路径，不要假设）
 - 笔记根：`<vault>\网课笔记\`
 - 总览画板：`<vault>\网课笔记\📊 网课总览.md`
 - **每节课一个项目文件夹**：`网课笔记\YYYY-MM-DD 课程名\`，内含：
