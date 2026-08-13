@@ -1,0 +1,9 @@
+# 核心依赖
+numpy
+sounddevice>=0.5
+faster-whisper>=1.0
+ctranslate2>=4.8
+
+# GPU 转写所需 CUDA 库（ctranslate2 4.8+ 不再自带）
+nvidia-cublas-cu12
+nvidia-cudnn-cu12
