@@ -1,103 +1,107 @@
-# 网课笔记 · Wangke Notes
+# Online Record Notes
 
-一个 AI Agent skill：记录电脑正在播放的网课（系统声音）→ 本地 Whisper 转写 → 生成七模块结构化笔记存入 Obsidian。**音频全程不出电脑。**
+An AI Agent skill that records online courses playing on your computer (system audio) → transcribes locally with Whisper → generates a seven-section structured note in Obsidian. **Audio never leaves your machine.**
 
-## 效果预览
+## Preview
 
-每节网课自动生成一个项目文件夹：
+Each course becomes a self-contained project folder:
 
 ```
-网课笔记/
-├── 📊 网课总览.md                ← 总画板（Dataview 自动汇总所有课程）
-└── 2026-08-14 深度学习第3讲/       ← 每课一个项目
-    ├── 笔记.md                   ← 开头是思维导图（手绘风）
-    ├── 思维导图.excalidraw.md
-    ├── 原始记录.md               ← 完整转写稿（带时间戳）
-    └── 录音/                     ← 原始录音分段
+网课笔记/ (course notes root in your vault)
+├── 📊 网课总览.md                ← dashboard (Dataview auto-aggregates all courses)
+└── 2026-08-14 Deep Learning L3/   ← one folder per course
+    ├── 笔记.md                   ← note with mind map at the top (hand-drawn)
+    ├── 思维导图.excalidraw.md     ← editable mind map (Excalidraw)
+    ├── 原始记录.md               ← full transcript with timestamps
+    └── 录音/                     ← raw audio segments
 ```
 
-笔记包含七个模块：
+The note contains seven sections:
 
-| 模块 | 内容 |
+| Section | Content |
 | --- | --- |
-| 🗺️ 思维导图 | 手绘风知识导图（Excalidraw，可编辑） |
-| 📌 一句话总结 | 这节课讲了什么 |
-| 🧠 核心内容 | 知识点提炼 |
-| 📚 智能章节 | 按知识结构分章 + 时间戳 |
-| 🎯 重点结论 | 核心观点/考点 |
-| 💎 金句时刻 | 老师原话摘录 |
-| 📜 原始记录 | 完整逐字稿 |
+| 🗺️ Mind map | Hand-drawn knowledge map (Excalidraw, editable) |
+| 📌 One-line summary | What this course is about |
+| 🧠 Core content | Distilled knowledge points |
+| 📚 Smart chapters | Chapters by knowledge structure + timestamps |
+| 🎯 Key takeaways | Core conclusions / exam points |
+| 💎 Quote moments | Verbatim quotes from the instructor |
+| 📜 Raw transcript | Full transcript |
 
-示例见 [examples/](examples/)（真实网课片段实录）。
+See [examples/](examples/) for a real output sample.
 
-## 工作原理
+## How it works
 
 ```
-网课播放（电脑声卡）
-    ↓ sounddevice WASAPI loopback 录制系统声音
-录音分段（每 60 秒落盘，防丢）
-    ↓ faster-whisper large-v3（int8，GPU 加速）
-带时间戳逐字稿
-    ↓ Agent 按 SKILL.md 规则整理
-七模块笔记 + 思维导图 → Obsidian
+Course playing on your PC (sound card)
+    ↓ sounddevice WASAPI loopback records system audio
+Segmented recordings (flushed to disk every 60s, crash-safe)
+    ↓ faster-whisper large-v3 (int8, GPU accelerated)
+Timestamped transcript
+    ↓ Agent follows SKILL.md rules to structure it
+Seven-section note + mind map → Obsidian
 ```
 
-## 安装
+## Installation
 
-### 1. 克隆仓库
+### 1. Clone
 
 ```bash
 git clone https://github.com/Roc8458/online-record-notes-skill.git
 ```
 
-### 2. 安装 skill 到你的 Agent
+### 2. Install the skill into your Agent
 
-- **Hermes**：把 `skills/online-record-notes` 复制到 Hermes skills 目录（`hermes` 的 skills 文件夹下）
-- **Codex**：复制到 `~/.codex/skills/`
-- **Claude Code**：复制到 `~/.claude/skills/`
-- 或者直接跟你的 Agent 说：*"帮我安装 https://github.com/Roc8458/online-record-notes-skill 里的 skill"*
+- **Hermes**: copy `skills/online-record-notes` into Hermes' skills directory
+- **Codex**: copy to `~/.codex/skills/`
+- **Claude Code**: copy to `~/.claude/skills/`
+- Or just tell your Agent: *"Install the skill from https://github.com/Roc8458/online-record-notes-skill"*
 
-### 3. 安装 Python 依赖
+### 3. Install Python dependencies
 
 ```bash
 pip install -r skills/online-record-notes/scripts/requirements.txt
 ```
 
-### 4. 下载转写模型（3GB，一次性）
+### 4. Download the transcription model (3GB, one-time)
 
-large-v3 是 Whisper 系列最强型号（中文准确率接近商用）。国内建议走 hf-mirror 镜像（直连稳定，无需 VPN）：
+large-v3 is Whisper's strongest model (Chinese accuracy close to commercial services). Users in mainland China should use the hf-mirror (direct connection, no VPN needed):
 
 ```python
 import os
 os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
-os.environ["HF_HUB_DISABLE_XET"] = "1"  # 镜像站不支持 Xet 协议，必须禁用
+os.environ["HF_HUB_DISABLE_XET"] = "1"  # mirror doesn't support Xet protocol
 from huggingface_hub import snapshot_download
 snapshot_download("Systran/faster-whisper-large-v3",
                   local_dir="D:/hf-whisper/faster-whisper-large-v3")
 ```
 
-改模型位置的话，同步改 `scripts/transcribe.py` 顶部的 `MODEL_PATH`。
+If you change the model location, update `MODEL_PATH` at the top of `scripts/transcribe.py`.
 
-### 5. 确认 Obsidian
+### 5. Obsidian setup
 
-- 笔记存进你的 Obsidian vault 的 `网课笔记/` 文件夹（SKILL.md「目录约定」里确认路径）
-- 总览画板需要 **Dataview 插件**
-- 思维导图需要 **Excalidraw 插件**
+- Notes go into `网课笔记/` folder inside your Obsidian vault (confirm the vault path in SKILL.md's directory conventions)
+- Dashboard requires the **Dataview** plugin
+- Mind maps require the **Excalidraw** plugin
 
-## 使用
+## Usage
 
-1. 看网课前说：**「开始记录网课」**（Agent 会问课程名，然后后台录音）
-2. 看完课说：**「停止并整理」**
-3. 等转写（1 小时课约 25-40 分钟，后台跑）
-4. 笔记自动出现在 Obsidian，总览画板自动更新
+1. Before the course starts, tell your Agent: **"Start recording the course"** (it asks for a course name, then records in the background)
+2. After the course: **"Stop and organize"**
+3. Wait for transcription (a 1-hour course takes ~25-40 min in the background)
+4. Notes appear in Obsidian; the dashboard updates automatically
 
-## 硬件要求
+## Requirements
 
 - Windows 10/11
-- NVIDIA 显卡（实测 RTX 4060 Laptop 8GB，CUDA 12）
-- 约 4GB 磁盘（模型 3GB + CUDA 库 1.3GB）
-- 无 NVIDIA 显卡也可跑 CPU 模式（改 transcribe.py 的 `device="cpu"`，速度慢约 10 倍）
+- NVIDIA GPU (tested on RTX 4060 Laptop 8GB, CUDA 12)
+- ~4GB disk (3GB model + 1.3GB CUDA libraries)
+- No NVIDIA GPU? CPU mode works too (set `device="cpu"` in transcribe.py, ~10x slower)
 
 ## License
 
 MIT © 2026 Roc Wan
+
+## 中文说明
+
+[中文文档请见 README.zh.md](README.zh.md)
