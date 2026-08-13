@@ -1,5 +1,5 @@
 ---
-name: wangke-notes
+name: online-record-notes
 description: Use when 用户要记录网课整理成笔记。录音转写后生成七模块笔记存 Obsidian。
 version: 1.0.0
 author: Roc Wan

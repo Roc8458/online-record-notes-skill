@@ -47,20 +47,20 @@
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/Roc8458/wangke-notes-skill.git
+git clone https://github.com/Roc8458/online-record-notes-skill.git
 ```
 
 ### 2. 安装 skill 到你的 Agent
 
-- **Hermes**：把 `skills/wangke-notes` 复制到 Hermes skills 目录（`hermes` 的 skills 文件夹下）
+- **Hermes**：把 `skills/online-record-notes` 复制到 Hermes skills 目录（`hermes` 的 skills 文件夹下）
 - **Codex**：复制到 `~/.codex/skills/`
 - **Claude Code**：复制到 `~/.claude/skills/`
-- 或者直接跟你的 Agent 说：*"帮我安装 https://github.com/Roc8458/wangke-notes-skill 里的 skill"*
+- 或者直接跟你的 Agent 说：*"帮我安装 https://github.com/Roc8458/online-record-notes-skill 里的 skill"*
 
 ### 3. 安装 Python 依赖
 
 ```bash
-pip install -r skills/wangke-notes/scripts/requirements.txt
+pip install -r skills/online-record-notes/scripts/requirements.txt
 ```
 
 ### 4. 下载转写模型（3GB，一次性）
