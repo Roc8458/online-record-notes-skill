@@ -2,6 +2,8 @@
 
 An AI Agent skill that records online courses playing on your computer (system audio) → transcribes locally with Whisper → generates a seven-section structured note in Obsidian. **Audio never leaves your machine.**
 
+v1.2.0 new: recording engine switched to **pyaudiowpatch (WASAPI loopback)** — sounddevice/WDM-KS broke on some systems (`PaErrorCode -9996`). Audio now lands on a configurable `RECORD_BASE` drive (default `D:\ai recording`, keeps your system drive free). Added detached-process launch (immune to agent background-process cleanup), a 5-second watchdog, and a 1-minute cron sentinel — recording self-heals within ~10s if it ever dies.
+
 v1.1.0 new: content-based tagging → embed references into your Obsidian category folders → optional LLM Wiki sync (Karpathy-style concept cards). Turns each course from a one-off recording into long-term queryable knowledge.
 
 ## Preview
@@ -15,7 +17,7 @@ Online笔记/ (course notes root in your vault)
     ├── 笔记.md                   ← note with mind map at the top (hand-drawn)
     ├── 思维导图.excalidraw.md     ← editable mind map (Excalidraw)
     ├── 原始记录.md               ← full transcript with timestamps
-    └── 录音/                     ← raw audio segments
+    └── 录音/                     ← raw audio segments (stored under RECORD_BASE, default D:\ai recording, not the system drive)
 ```
 
 > Default folder is named "Online笔记" (not "网课笔记"); if you already have your own course-notes convention, follow yours instead.

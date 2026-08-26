@@ -2,6 +2,8 @@
 
 一个 AI Agent skill：记录电脑正在播放的网课（系统声音）→ 本地 Whisper 转写 → 生成七模块结构化笔记存入 Obsidian。**音频全程不出电脑。**
 
+v1.2.0 新功能：录音引擎换成 **pyaudiowpatch（WASAPI loopback）**（sounddevice/WDM-KS 在部分系统更新后失效，报 `PaErrorCode -9996`）；录音文件输出到可配置的 `RECORD_BASE`（默认 `D:\ai recording`，不占系统盘）；新增独立进程启动（免疫 Agent 后台进程清理）、5 秒级看门狗、1 分钟级 cron 哨兵——录音意外中断会在约 10 秒内自愈。
+
 v1.1.0 新功能：笔记按内容打标签 → 引用到 Obsidian 八大类文件夹 → 可选联动 LLM Wiki（Karpathy 式概念卡知识库），把网课从「一次性记录」变成「长期可查询的知识」。
 
 ## 效果预览
@@ -15,7 +17,7 @@ Online笔记/
     ├── 笔记.md                   ← 开头是思维导图（手绘风）
     ├── 思维导图.excalidraw.md
     ├── 原始记录.md               ← 完整转写稿（带时间戳）
-    └── 录音/                     ← 原始录音分段
+    └── 录音/                     ← 原始录音分段（存在 RECORD_BASE，默认 D:\ai recording，不占系统盘）
 ```
 
 > 默认文件夹叫「Online笔记」（不是「网课笔记」）；如果你已有自己的网课文件夹约定，跟随你的约定即可。

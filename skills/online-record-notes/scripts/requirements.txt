@@ -1,6 +1,6 @@
 # 核心依赖
 numpy
-sounddevice>=0.5
+pyaudiowpatch>=0.2.12
 faster-whisper>=1.0
 ctranslate2>=4.8
 
