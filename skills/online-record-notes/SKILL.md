@@ -34,8 +34,8 @@ metadata:
 
 1. 用户说「开始记录网课」时：
    - **不问课程名，直接开录**：用录制日期临时命名（如 `2025-09-04 网课`）
-   - 创建录音目录：`D:\ai recording\YYYY-MM-DD 网课\录音\`（📌 录音不占 C 盘）
-   - 启动录音 + 哨兵，告知用户「开始录了，去看课吧」
+   - **启动桌面卡片并自动开始录制**：`python <skill_dir>/scripts/record_desktop.py --auto-start`（DETACHED 无窗口，卡片始终置顶，用户可从卡片暂停/结束）
+   - 哨兵自动启用，告知用户「开始录了，去看课吧」
    - 结束后根据转写内容重命名文件夹（简短，如「remotion入门」「深度学习3」）
 2. 录音脚本：`scripts/record.py`（pyaudiowpatch WASAPI loopback 录系统声音，输出 wav）
    - 依赖：`pip install pyaudiowpatch`（已装 hermes venv；sounddevice 的 WDM-KS/WASAPI 在本机已失效 PaErrorCode -9996）
