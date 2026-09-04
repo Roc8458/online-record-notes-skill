@@ -52,7 +52,7 @@ metadata:
    - **用独立进程启动录音**（不要用 terminal background 直接跑 record.py——Agent 后台进程可能被误杀）：
      `python <skill_dir>/scripts/start_record_detached.py "<RECORD_BASE>/YYYY-MM-DD 课程名/录音"`
    - 启动「高频看门狗」：`python <skill_dir>/scripts/watch_dog.py`（每 5 秒检查录音，挂了自动重启）
-   - 有 Hermes/cron 时，建 cron 哨兵跑 `scripts/record_sentinel.py`（every 1m, no_agent）保活看门狗
+   - 有 Hermes/cron 时，`cronjob action=resume job_id=a84f9f008220` 恢复录音哨兵（every 1m, no_agent）保活看门狗
    - 告知用户「开始录音了，看完课说『停止并整理』」
 2. 录音脚本：`scripts/record.py`（pyaudiowpatch WASAPI loopback 录系统声音，输出 wav）
    - 依赖：`pip install pyaudiowpatch`（sounddevice 的 WDM-KS/WASAPI 在部分系统已失效，PaErrorCode -9996，勿回退）
@@ -67,6 +67,7 @@ metadata:
 ## 转写流程
 
 1. 用户说「停止记录」时：**在录音输出目录创建 `stop.flag` 文件**（用 write_file 写一个空文件即可），脚本检测到后优雅保存退出
+   - 同时 `cronjob action=pause job_id=a84f9f008220` 暂停录音哨兵
    - 录音脚本每 60 秒落盘一段 `seg_XXXX.wav`，即使异常被杀，已落盘的分段完好（转写脚本直接读目录合并）
    - 注意：部分 Agent 环境后台进程 stdin 不可用，不要用 process write/submit 停录音；用 stop.flag 文件
 2. 运行转写：`python <skill_dir>/scripts/transcribe.py <录音目录> <原始记录.md>`（目录含 seg_*.wav，自动合并）
