@@ -32,10 +32,13 @@ metadata:
 
 ## 录音流程
 
+> **桌面卡片（record_desktop.py）只是录音控制的 UI 壳**：内部唯一动作 = 调 `start_record_detached.py` 启动录音 + 创建 `stop.flag` 停止，与下面第 2 步直接启动完全等效；不含任何独立逻辑。卡片可不启动，语音直接触发一样能录。
+
 1. 用户说「开始记录网课」时：
    - **不问课程名，直接开录**：用录制日期临时命名（如 `2025-09-04 网课`）
-   - **启动桌面卡片并自动开始录制**：`python <skill_dir>/scripts/record_desktop.py --auto-start`（DETACHED 无窗口，卡片始终置顶，用户可从卡片暂停/结束）
-   - 哨兵自动启用，告知用户「开始录了，去看课吧」
+   - **启动桌面卡片并自动开始录制**：`python <skill_dir>/scripts/record_desktop.py --auto-start`（DETACHED 无窗口，卡片始终置顶，用户可从卡片暂停/继续/结束——内部只是 stop.flag 启停）
+   - 同时 `cronjob action=resume job_id=a84f9f008220` 恢复录音哨兵（录音期间保活）
+   - 告知用户「开始录了，去看课吧，结束后说『停止并整理』」
    - 结束后根据转写内容重命名文件夹（简短，如「remotion入门」「深度学习3」）
 2. 录音脚本：`scripts/record.py`（pyaudiowpatch WASAPI loopback 录系统声音，输出 wav）
    - 依赖：`pip install pyaudiowpatch`（已装 hermes venv；sounddevice 的 WDM-KS/WASAPI 在本机已失效 PaErrorCode -9996）
@@ -152,6 +155,7 @@ summary: <一句话总结>
 2. **record.py 崩溃 AxisError: axis 1 out of bounds**：pyaudiowpatch callback 的 in_data 是一维字节流，必须 `np.frombuffer(...).reshape(-1, channels)` 再 mean(axis=1)，当前脚本已内置。
 3. **录音进程被误杀/中断**：不要用 terminal background=true 跑录音（Hermes 会偶发清理后台进程，2026-08-27 实测中断一次）；必须用 start_record_detached.py 独立进程。若已用独立进程仍中断，查 record.log 尾部 + 哨兵 cron（record_sentinel.py）会自动重启。
 2. **用户中途换课**：新课程要重新说「开始记录网课」，一节课一个文件夹。
+3. **卡片点「结束」≠ 完成流程**：卡片结束只创建 stop.flag 停录音（等价于用户口头停止），转写+笔记+Obsidian 落盘仍要用户说「停止并整理」触发；关卡片窗口（✕）会先自动停录音再退出。
 3. **转写很慢别催**：后台任务跑，完成通知后再继续，别中途 poll。
 4. **m4a 不直接转**：录音脚本输出 wav，转写脚本也支持 m4a/mp3（faster-whisper 内部解码），用户如果自己录了 m4a 也能用。
 5. **总览画板不显示**：检查笔记 frontmatter 的 tags 含「网课笔记」，且文件在「Online笔记」文件夹下（Dataview FROM 路径匹配）。
